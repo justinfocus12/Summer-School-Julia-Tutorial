@@ -12,7 +12,7 @@ begin
 	include("utils.jl")  # load local source file
 	using .Utilities  # "utils.jl" has a module called "Utilities"
 
-	TableOfContents(aside=true)  # imported from PlutoUI
+	TableOfContents(aside=true, depth=3)  # imported from PlutoUI
 end
 
 # ╔═╡ a9561c08-2b07-4590-b901-d9cbd60355ee
@@ -46,6 +46,8 @@ md"## Basic Calculation"
 # ╔═╡ 50c86554-ff09-4e4a-94e8-0f30b83e8655
 @show 3+4 3*4 3/4 3÷4 4%3 3^4 3<4 3>=4 3==4 3!=4;
 
+=======
+>>>>>>> b1d00304e6d5dbc8b7f1184b4ee32f98dd5d9026
 # ╔═╡ 1cd98952-cd47-4632-a71a-903f1809d6be
 md"`@show` is a macro that prints expressions and their evaluated values. Read more about macros [here](https://docs.julialang.org/en/v1/manual/metaprogramming/#man-macros)."
 
@@ -64,14 +66,11 @@ z == -1 ? print("Hurray!") : print("Why?")  # ternary operator
 # ╔═╡ 86e687c7-4052-4d11-9ef9-7ac6b59cb8ae
 md"It's a common problem of floating point arithmetic. [All positional (base-N) number systems share this problem with precision](https://stackoverflow.com/questions/588004/is-floating-point-math-broken?rq=1)."
 
-# ╔═╡ cdac9eca-48a6-44dd-9926-a1e0959c2c31
-(@show 0.1 + 0.2) == 0.3
-
 # ╔═╡ 5c64daca-361a-4c3b-92e0-b179c834a63e
 z ≈ -1 ? print("Hurray!") : print("Why?")  # \approx <tab> => ≈
 
 # ╔═╡ 9cde569d-7db4-4c06-8e03-346b32afaa16
-md"## Compound expressions and binding"
+md"## Compound Expressions and Local Scope"
 
 # ╔═╡ f2496da6-a024-44eb-b1ee-6cd5e213a86a
 md"**Local binding with `let`**"
@@ -85,25 +84,8 @@ end
 # ╔═╡ 45737508-e741-445d-86ef-850ab9915039
 md"**Non-local binding via `begin`**"
 
-# ╔═╡ 88c296f4-51c7-4968-84d4-7d7d66288d8c
-begin # after executing `a` and `b` will now be in the global scope. 
-	a = 1
-	b = 2
-	a + b
-end
-
-# ╔═╡ 0d376fb5-3b55-4607-903b-1a1777f77215
-a
-
 # ╔═╡ 5dedb5f1-1e4e-4b47-9e28-46d9d901f6ca
 md"`begin...end` can be treated as an expression: it has a value"
-
-# ╔═╡ 636db2a4-c4f7-49ff-8cd6-9956e15e5f6e
-three = begin
-	c = 1
-	d = 2
-	c + d
-end
 
 # ╔═╡ b541204e-3054-4504-b8f4-913209f19913
 md"## Control Structures"
@@ -154,12 +136,9 @@ md"""ComplexF64 is a *composite* type as it is a collection of named fields.
 
 The curly brackets in `Complex{Float64}` means `Complex` is a parametric type, and what's inside the following braces (e.g. `Float64`) is its parameter."""
 
-# ╔═╡ 559143b7-a4e1-4532-adde-523ba70e7d36
-typeof(1+im)
-
 # ╔═╡ 8af405f5-01c3-45e3-8451-3e3ac287466f
 for s in fieldnames(Tz)
-	println("z.", s, " = ", getfield(z, s))
+	println("z.", s, " = ", getfield(z, s))  # `println` prints a newline at the end
 end
 
 # ╔═╡ a292b548-502b-455b-9ed8-15843b0930dc
@@ -170,11 +149,6 @@ fieldnames(Float64)  # primitive type (no fields)
 
 # ╔═╡ 79305e1d-a394-4247-b459-cd70a1d29213
 md"The results above are tuples. Tuple is an `immutable` type, which means its items cannot be modified."
-
-# ╔═╡ c88262d4-ba12-4955-9022-7724909231ee
-let t = (1, 2, 3, 4)
-	t[1] += 1
-end
 
 # ╔═╡ ccd1d5e8-88b6-40af-a850-e16deb9718e9
 md"**While Loop:**"
@@ -199,10 +173,12 @@ md"""
 """
 
 # ╔═╡ 8d8c7053-1a23-485f-90c5-2db999f7581d
-md"(Show this cell for a sample solution)"
-# for T in fieldtypes(typeof(z))
-# 	println(fieldtypes(T) == () ? "primitive" : "composite")
-# end
+begin
+	md"(Show this cell for a sample solution)"
+	# for T in fieldtypes(typeof(z))
+	# 	println(fieldtypes(T) == () ? "primitive" : "composite")
+	# end
+end
 
 # ╔═╡ b5b168db-b896-41bb-afeb-08e328d7b28e
 md"## Function Definition"
@@ -248,27 +224,6 @@ end
 
 # ╔═╡ 4a851df6-3894-42a9-9acd-eb25a56f5535
 md"### Higher Order Functions"
-
-# ╔═╡ 1396345b-8abf-48ac-8bfa-6c641a395c2c
-begin
-	inc = x -> x + 1  # anonymous function
-	
-	double(f) = x -> f(f(x))  # a shorthand of `function double(f) ... end`
-	@show double(inc)(0)
-	
-	triple(f) = f ∘ f ∘ f  # \circ <tab> => ∘ (function composition)
-	@show triple(inc)(0)
-
-	@show double(triple)(double)(inc)(0)  # 2 ^ (3 ^ 2)
-end
-
-# ╔═╡ ef02cbb9-11af-49e9-a996-f2c44c9c1191
-begin
-	nfold(f, n) = reduce(∘, Iterators.repeated(f, n))  # generalize double and triple
-	est_pi = nfold(x -> x + sin(x), 5)
-	println(est_pi(1))
-	md"(Optional) Estimate π using fixed point iteration:"
-end
 
 # ╔═╡ c7bff4de-88ca-4264-bf83-4a2f08728395
 md"### Recursive Functions"
@@ -361,10 +316,10 @@ md"**Bonus point:** update your function to make the execution time of the follo
 @time fib(42)
 
 # ╔═╡ 8116c816-ab72-4415-94bf-a66ad7f52d2d
+"Call the `fib` function in the C library `libgmp`."
 function fib_c(n)
     z = BigInt()
     @ccall "libgmp".__gmpz_fib_ui(z::Ref{BigInt}, n::Culong)::Cvoid
-	# Call the fib function in the C library libgmp
     return z
 end
 
@@ -418,6 +373,70 @@ begin  # method overloading
 	Statistics.mean(p::AbstractNormal) = p.μ
 	Statistics.std(p::AbstractNormal) = p.σ
 	Statistics.var(p::AbstractNormal) = p.σ ^ 2
+
+	function Base.:+(p1::T, p2::T) where {T<:AbstractNormal}  # operator overloading
+		T(mean(p1) .+ mean(p2), √(var(p1) + var(p2)))
+	end
+end
+
+# ╔═╡ 52ab5184-2f0f-11ef-3034-8fd6a5c8a2cb
+(1 + 2) * 3 ^ 2
+
+# ╔═╡ 50c86554-ff09-4e4a-94e8-0f30b83e8655
+@show 3+4 3*4 3/4 3÷4 4%3 3^4 3<4 3>=4 3==4 3!=4;
+
+# ╔═╡ cdac9eca-48a6-44dd-9926-a1e0959c2c31
+(@show 0.1 + 0.2) == 0.3
+
+# ╔═╡ 88c296f4-51c7-4968-84d4-7d7d66288d8c
+begin # after executing `a` and `b` will now be in the global scope. 
+	a = 1
+	b = 2
+	a + b
+end
+
+# ╔═╡ 0d376fb5-3b55-4607-903b-1a1777f77215
+a
+
+# ╔═╡ 636db2a4-c4f7-49ff-8cd6-9956e15e5f6e
+three = begin
+	c = 1
+	d = 2
+	c + d
+end
+
+# ╔═╡ 559143b7-a4e1-4532-adde-523ba70e7d36
+typeof(1+im)
+
+# ╔═╡ c88262d4-ba12-4955-9022-7724909231ee
+let t = (1, 2, 3, 4)
+	t[1] += 1
+end
+
+# ╔═╡ 1396345b-8abf-48ac-8bfa-6c641a395c2c
+begin
+	inc = x -> x + 1  # anonymous function
+	
+	double(f) = x -> f(f(x))  # a shorthand of `function double(f) ... end`
+	@show double(inc)(0)
+	
+	triple(f) = f ∘ f ∘ f  # \circ <tab> => ∘ (function composition)
+	@show triple(inc)(0)
+
+	@show double(triple)(double)(inc)(0)  # 2 ^ (3 ^ 2)
+end
+
+# ╔═╡ ef02cbb9-11af-49e9-a996-f2c44c9c1191
+begin
+	nfold(f, n) = reduce(∘, Iterators.repeated(f, n))  # generalize double and triple
+	est_pi = nfold(x -> x + sin(x), 5)
+	println(est_pi(1))
+	md"(Optional) Estimate π using fixed point iteration (click the eye to show the cell):"
+end
+
+# ╔═╡ a3fe5049-4dcb-4071-9618-6b637b20fcc7
+function sample(p::AbstractNormal, dims::Integer...)
+	randn(size(p.μ)..., dims...) .* p.σ .+ p.μ
 end
 
 # ╔═╡ 76d61e6d-16e8-440d-99f7-51a3775694b9
@@ -444,6 +463,9 @@ p1 = NormalUntyped(0, 1)
 # ╔═╡ b13074cb-0a3a-48b7-97ac-b9ef93fa184a
 mean(p1)
 
+# ╔═╡ eeb1f9c3-6342-4ff3-a731-77ec4a55ebd1
+sample(p1, 5)
+
 # ╔═╡ cc45cdea-38c6-4c06-b62c-09a36559bfd6
 @which mean(p1)
 
@@ -456,13 +478,11 @@ p1(0)
 # ╔═╡ f3b4eba4-5471-441e-b199-69fd07f528e2
 md"A piece of Julia code is called 'type-stable' if all input and output variables have a concrete type, either by explicit declaration or by inference from the Julia compiler. Type-stable code will run much faster as the compiler can generate statically typed code and optimize it at compile-time."
 
-<<<<<<< Updated upstrea
-
 # ╔═╡ cfeb3928-cc2f-47a3-8a9b-e17eabd79a33
 @code_warntype p1(0)
 
 # ╔═╡ c6739f52-f87f-4bef-8c32-ce3ec4942342
-@code_native p1(0)
+@code_llvm p1(0)
 
 # ╔═╡ 035f9794-43ea-4e19-860c-a66fd0ea1a14
 struct Normal <: AbstractNormal
@@ -473,11 +493,17 @@ end
 # ╔═╡ 57f30a3c-7d28-4819-958a-bf1859d6947c
 p2 = Normal(0, 1)
 
+# ╔═╡ ed7082dc-cd39-4488-842c-1f05968224bf
+Normal(-1, 3) + Normal(3, 4)
+
 # ╔═╡ 024aa7d5-a569-4639-851f-b7d491855202
 @code_warntype p2(0)
 
 # ╔═╡ f640df71-ae15-4b67-a30e-c806ea532a19
-@code_native p2(0)
+@code_llvm p2(0)
+
+# ╔═╡ a4c7126d-57dd-4542-bcc4-d01cf657759a
+md"Parametric types like `Complex{T}` allow parametric polymorphism."
 
 # ╔═╡ 76d2cfde-bdd8-4e45-83dd-92d3c651691f
 struct NormalParametric{T} <: AbstractNormal
@@ -486,17 +512,19 @@ struct NormalParametric{T} <: AbstractNormal
 end
 
 # ╔═╡ 1e36bd1d-cb83-4e48-a5dc-f88bf04636ca
-p3 = NormalParametric(0f0, 5f-1)  # float32 version of 5e-1
-
-# ╔═╡ 74c57fe8-e369-44f1-a51e-8365e4ffed5d
-md"An advantage of parametric types is that a single piece of code can handle a variety of concrete types. This is called `generic programming`."
->>>>>>> Stashed changes
-
-# ╔═╡ 00ed2dc6-f770-49da-9eac-35042f437b6e
-NormalParametric([0.0, 0.1], [0.5, 1.0])
+p3 = NormalParametric(0f0, 1f0)  # float32 versions of 0e0 and 1e0
 
 # ╔═╡ b088c77f-9732-4c63-88f9-9bcd911e461c
 @code_warntype p3(0)
+
+# ╔═╡ 74c57fe8-e369-44f1-a51e-8365e4ffed5d
+md"An advantage of parametric types is that a single piece of code can handle a variety of concrete types. This is called `generic programming`."
+
+# ╔═╡ 00ed2dc6-f770-49da-9eac-35042f437b6e
+p4 = NormalParametric([0.0, 0.1], [0.5, 1.0])
+
+# ╔═╡ 0f7f260c-fbb2-4661-be71-86fe23a51d92
+sample(p4, 5)
 
 # ╔═╡ 2e6521be-ff66-47a9-8c19-68216cb62f3d
 md"We can see that the length of the LLVM bitcodes generated from a piece of type-stable Julia code is much shorter than its type-instable version. The following example will compare their performance."
@@ -518,11 +546,23 @@ end
 # ╔═╡ 7b6e1d43-c72c-4bd9-b493-838b05e845c4
 md"## Collection Data Types"
 
+# ╔═╡ 63eddb5a-960c-43c6-9425-5caa40f4802f
+md"### Range"
+
+# ╔═╡ 51c754f6-ba17-4936-8e1e-89899634e37d
+md"### Array"
+
 # ╔═╡ aa08b116-025a-43cd-8f0d-74e035b9746d
-md"**Vector:**"
+md"#### Vector"
 
 # ╔═╡ 69283b2e-bd47-4c3c-890f-677b253183e7
 v = [1, 2, 3, 4, 5]
+
+# ╔═╡ 760ff5fd-689b-4afe-9336-cc480fb6b486
+let r = 1:2:5
+	@show v[r] r.start r.stop r.step
+	collect(r)  # convert to array
+end
 
 # ╔═╡ a2c92fca-fbab-4396-b472-a53d7a858abe
 typeof(v)
@@ -566,17 +606,8 @@ md"Julia adopts [column major order](https://en.wikipedia.org/wiki/Row-_and_colu
 # ╔═╡ 071a0163-3071-4398-bc46-d12c11bbcba0
 hcat(v[1:3], v[1:2:end-1], v[end:-2:1])  # concatenate horizontally
 
-# ╔═╡ 4aa0d597-49b7-4e8f-807e-0181f6d75dae
-md"**Range:**"
-
-# ╔═╡ 760ff5fd-689b-4afe-9336-cc480fb6b486
-let r = 1:2:5
-	@show v[r] r.start r.stop r.step
-	collect(r)  # convert to array
-end
-
 # ╔═╡ ce603931-baa5-48aa-ba13-82b458962ddf
-md"**Matrix:**"
+md"#### Matrix"
 
 # ╔═╡ 3cfce228-b634-4e31-b3f3-ddadb6c7a53d
 Array{Int, 2}
@@ -589,7 +620,7 @@ Array{Int, 2}
 # ╔═╡ 4f62d53f-11bb-4e53-b759-d6f49eec5cd4
 let a = Array{Float64}(undef, 2, 3)  # initialize a 2x3 Matrix of Float64s
 	@show a
-	for i=1:2, j in 1:3  # equivalent to a nested loop (inner loop is on j)
+	for i in 1:2, j in 1:3  # equivalent to a nested loop (inner loop is on j)
 		a[i, j] = i * j
 	end
 	a
@@ -599,7 +630,7 @@ end
 [i * j for i in 1:2, j in 1:3]  # array comprehension
 
 # ╔═╡ ae856b3a-795a-4f99-90d0-c5c9ffacc3e9
-[i * j for i in 1:2 for j in 1:3]  # no extra dimensions
+[(i, j) for i in 1:2 for j in 1:3]  # no extra dimensions
 
 # ╔═╡ d02b8c20-6e43-435c-ba9f-870b1bb5fae9
 zeros(3, 3)  # or ones
@@ -652,8 +683,6 @@ A'  # adjoint: complex conjugate followed by transpose
 # ╔═╡ 12008adf-5162-484c-af6b-30b2d43f46b5
 sum(A, dims=2)  # sum along the 2nd axis
 
-<<<<<<< Updated upstrea
-
 # ╔═╡ 65f92119-b389-491c-b809-fab91636c53a
 mean(A)
 
@@ -662,7 +691,6 @@ mean(A, dims=1)
 
 # ╔═╡ a5717c60-1abe-4164-a4c0-45708212f95d
 B = copy(A)
->>>>>>> Stashed changes
 
 # ╔═╡ 17eeffee-701d-4251-aca7-308e456487da
 let C = reshape(B, 2, 3), D = B', E = B[1:2,:], F = @view B[1:2,:]
@@ -674,62 +702,48 @@ let C = reshape(B, 2, 3), D = B', E = B[1:2,:], F = @view B[1:2,:]
 	B, C, D, E, F
 end
 
->>>>>>> Stashed change
-
 # ╔═╡ fad551be-abbc-45c6-b08c-5e8d4ddccdb0
-md"**Generic functions of iterable types (Polymorphism):**"
+md"## Generic Functions of Iterables"
 
 # ╔═╡ 26f43214-3b99-4c99-9512-398a28f9ae0a
 md"""
 !!! danger "Task"
-	Generate a 1000×2 random matrix of float numbers from the normal distribution ``N(0, 1)`` using the `randn` function and assign it to `Q`.
+	Generate a 2×1000 random matrix of float numbers from the normal distribution ``N(\mu, \sigma)`` where ``\mu`` is the first column of `S` and ``\sigma`` is the second column of `S`, and assign it to `Q`.
 """
+
+# ╔═╡ 24077fc9-4d06-4b80-91be-321a7bb0fe5c
+S = [2.0 1.2; -1.0 0.6]
 
 # ╔═╡ b226106d-6f21-4d72-951c-c4d9d01cbbcb
 Q = missing  # replace missing with your answer
 
 # ╔═╡ 820f0070-98b9-4bf6-a8db-65383e7c3c17
-# plots will be generated after you finish the tasks
 if !ismissing(Q)
 	using Plots
-	plt1 = scatter(Q[:, 1], Q[:, 2])
-	plt2 = histogram(Q, bins=range(-3, 5.5, length=50))
+	plt1 = scatter(eachrow(Q)...)
+	plt2 = histogram(Q', bins=range(-3, 5.5, length=50))
 	plot(plt1, plt2, layout=(2, 1), legend=false, size=(600, 800))
+else
+	md"Some plots will be generated after you finish the tasks."
 end
 
 # ╔═╡ aa0c8fec-254b-4805-bf07-b1ce7266685c
 begin
 	md"(Show this cell for a sample solution)"
-	# Q = randn(1000, 2)
-end
-
-# ╔═╡ 03c85588-2237-4d17-9755-bd3386f8e348
-md"""
-!!! danger "Task"
-	Scale each column of Q by the values in the second row of `S`, and then shift each column of Q by the first row of `S`. These operations should be in-place.
-"""
-
-# ╔═╡ 24077fc9-4d06-4b80-91be-321a7bb0fe5c
-S = [2.0 -1.0; 1.2 0.6]
-
-# ╔═╡ 50cb4c19-1d76-4844-8bc7-bc564aa34ab8
-begin
-	md"(Show this cell for a sample solution)"
-	# Q .= S[2, :]' .* Q .+ S[1, :]'
-	# OR
-	# @. Q = S[2, :]' * Q + S[1, :]'  # @. converts all operators to a broacasting one
+	# p_ex = NormalParametric(S[:,1], S[:,2])
+	# Q = sample(p_ex, 1000)
 end
 
 # ╔═╡ 8615c4ca-7e2b-49fb-bb0f-078347a7c56b
 md"""
 !!! danger "Task"
-	Calculate the `mean` and `std` of each column of `Q` and concatenate them vertically. Compare the result with `S`.
+	Calculate the `mean` and `std` of each row of `Q` and concatenate them horizontally. Compare the result with `S`.
 """
 
 # ╔═╡ be7f3b8d-70e6-4ec3-a98f-07fbe17fb06a
 begin
 	md"(Show this cell for a sample solution)"
-	# [mean(R, dims=1); std(R, dims=1)]
+	# [mean(Q, dims=2) std(Q, dims=2)]
 end
 
 # ╔═╡ 66cae8d2-8e20-4b1e-9dae-e120eee4d944
@@ -738,30 +752,30 @@ md"## Linear Algebra"
 # ╔═╡ 5af22ae0-effd-4589-bd1f-d375299b6848
 M = rand(3, 3)
 
-# ╔═╡ 493a6c95-3820-43aa-8e6c-939757aecf2b
-M - I  # I is identity matrix
-
-# ╔═╡ 2c379af2-73d9-4470-8f7f-9dafa789e951
-M ^ -1 * M ≈ I  # M ^ -1 == inv(M)
-
-# ╔═╡ 6287eddc-9b35-489e-b584-8197c09cb228
-let b = [1, 2, 3]
-	x = inv(M) * b  # or M \ b
-	@show M * x
-	M = [M rand(3)]  # size(M) = (3, 4)
-	y = M \ b
-	@show y
-	M * y  # or pinv(M) * b (least squares)
-end
-
 # ╔═╡ 5ee4f31b-ebae-4d8f-8ccc-6df671de6965
 begin
 	using LinearAlgebra
 	rank(M), tr(M), det(M), diag(M)
 end
 
-<<<<<<< Updated upstream
-======
+# ╔═╡ 859c21c8-74cc-4db1-9a35-4e75e4a4ab66
+v ⋅ v == dot(v, v) == norm(v) ^ 2 == v' * v  # \cdot <tab> => ⋅
+
+# ╔═╡ 493a6c95-3820-43aa-8e6c-939757aecf2b
+M - I  # I is identity matrix
+
+# ╔═╡ 2c379af2-73d9-4470-8f7f-9dafa789e951
+inv(M) * M == M ^ -1 * M ≈ I
+
+# ╔═╡ 6287eddc-9b35-489e-b584-8197c09cb228
+let b = [1, 2, 3]
+	x = inv(M) * b  # or M \ b
+	@show M * x
+	N = [M M]  # size(N) = (3, 6)
+	y = N \ b  # (least squares)
+	@show pinv(N) * b ≈ y
+	N * y
+end
 
 # ╔═╡ 3f6fbfd0-b35a-4af9-86cd-55d7e4188301
 let eig = eigen(M)
@@ -803,21 +817,17 @@ end
 	findfirst(iszero, a)
 	count(iseven, b)
 	map(abs2, a)
+	sum(abs2, a)  # == sum(map(abs2, a))
 	map(-, a, b)  # applies a binary operator to each pair in two sequences
 	zip(a, b, c) |> collect  # `a |> f` (pipe operator) is equivalent to `f(a)`
 	map(min, a, b, c)
 end
 
-# ╔═╡ 1cc93533-0edb-4db9-9016-4f52f3822b0a
-v' * v  # inner product
-
-# ╔═╡ b977a080-5e47-45fb-ad78-8080f93fa650
-v * v'  # outer product
-
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
@@ -834,7 +844,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.5"
 manifest_format = "2.0"
-project_hash = "6ada185533af54753faae1ff889d3debeb6cfeff"
+project_hash = "d5be2c1efeddaf18a4d70ea211137e85ab4d3f80"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -1886,8 +1896,8 @@ version = "1.4.1+1"
 
 # ╔═╡ Cell order:
 # ╟─0939489d-79d2-4c1a-9841-17d9ae448d94
-# ╠═a025f4ac-9f39-4d05-9e0f-c12b9145d7c6
 # ╟─b4cb3a82-d740-4d02-b0f4-f18ec9500b4f
+# ╠═a025f4ac-9f39-4d05-9e0f-c12b9145d7c6
 # ╟─4efa23f3-e705-469e-8e82-fb6d0e4589a3
 # ╠═52ab5184-2f0f-11ef-3034-8fd6a5c8a2cb
 # ╠═50c86554-ff09-4e4a-94e8-0f30b83e8655
@@ -1955,7 +1965,7 @@ version = "1.4.1+1"
 # ╟─bd7bed63-714c-417c-822c-2c07419d59db
 # ╟─0bcb6969-7e99-49ae-a57c-3c3b923f65f7
 # ╠═f3dfea15-4760-4294-badd-c2849426d53e
-# ╠═8116c816-ab72-4415-94bf-a66ad7f52d2d
+# ╟─8116c816-ab72-4415-94bf-a66ad7f52d2d
 # ╟─13104a6c-0eb7-42d7-961d-addc55f06588
 # ╠═002bd083-00d2-4fd6-965f-9415d85f23f6
 # ╠═e9f8aee3-aa16-446b-aeec-8d1aae6e7169
@@ -1967,6 +1977,7 @@ version = "1.4.1+1"
 # ╟─2e034e29-8755-43d5-b557-d247df23f50e
 # ╠═e3f7a77a-8c9e-4f15-af47-551fd959b2a6
 # ╠═0f2aff9d-778b-4a08-9c33-c1866279c686
+# ╠═a3fe5049-4dcb-4071-9618-6b637b20fcc7
 # ╠═3c74c07d-98a5-48b8-bf6c-2a25e85597d5
 # ╠═76d61e6d-16e8-440d-99f7-51a3775694b9
 # ╠═47cd214a-ba2b-486f-b576-f2a583b50b7e
@@ -1976,6 +1987,7 @@ version = "1.4.1+1"
 # ╠═fa1283d5-b3d5-46d4-a34c-4cddc32ab284
 # ╠═322ea469-2961-46b0-a93c-20e2c8f94328
 # ╠═b13074cb-0a3a-48b7-97ac-b9ef93fa184a
+# ╠═eeb1f9c3-6342-4ff3-a731-77ec4a55ebd1
 # ╠═cc45cdea-38c6-4c06-b62c-09a36559bfd6
 # ╟─beb7b5f4-ee86-4130-aa61-d3f8498ff4ed
 # ╠═ec5238e4-f445-491c-bd14-8e1aba59049f
@@ -1984,19 +1996,25 @@ version = "1.4.1+1"
 # ╠═c6739f52-f87f-4bef-8c32-ce3ec4942342
 # ╠═035f9794-43ea-4e19-860c-a66fd0ea1a14
 # ╠═57f30a3c-7d28-4819-958a-bf1859d6947c
+# ╠═ed7082dc-cd39-4488-842c-1f05968224bf
 # ╠═024aa7d5-a569-4639-851f-b7d491855202
 # ╠═f640df71-ae15-4b67-a30e-c806ea532a19
+# ╟─a4c7126d-57dd-4542-bcc4-d01cf657759a
 # ╠═76d2cfde-bdd8-4e45-83dd-92d3c651691f
 # ╠═1e36bd1d-cb83-4e48-a5dc-f88bf04636ca
+# ╠═b088c77f-9732-4c63-88f9-9bcd911e461c
 # ╟─74c57fe8-e369-44f1-a51e-8365e4ffed5d
 # ╠═00ed2dc6-f770-49da-9eac-35042f437b6e
-# ╠═b088c77f-9732-4c63-88f9-9bcd911e461c
+# ╠═0f7f260c-fbb2-4661-be71-86fe23a51d92
 # ╟─2e6521be-ff66-47a9-8c19-68216cb62f3d
 # ╠═149a64ba-6d5b-4416-bc2d-8e1ae897c71d
 # ╠═d00e9d96-59c7-4bd6-9667-340505d5ed5f
 # ╠═8e8a900f-1d6c-4d65-afda-b03e64f3c9c8
 # ╠═af5fffbd-baf5-46e4-b285-3a98a5d01e55
 # ╟─7b6e1d43-c72c-4bd9-b493-838b05e845c4
+# ╟─63eddb5a-960c-43c6-9425-5caa40f4802f
+# ╠═760ff5fd-689b-4afe-9336-cc480fb6b486
+# ╟─51c754f6-ba17-4936-8e1e-89899634e37d
 # ╟─aa08b116-025a-43cd-8f0d-74e035b9746d
 # ╠═69283b2e-bd47-4c3c-890f-677b253183e7
 # ╠═a2c92fca-fbab-4396-b472-a53d7a858abe
@@ -2013,8 +2031,6 @@ version = "1.4.1+1"
 # ╠═8cc1e1ca-207e-4dc3-b860-2c5c2114a49a
 # ╠═90a98f2a-6d97-4697-a4a7-ab1cac19d9e1
 # ╠═071a0163-3071-4398-bc46-d12c11bbcba0
-# ╟─4aa0d597-49b7-4e8f-807e-0181f6d75dae
-# ╠═760ff5fd-689b-4afe-9336-cc480fb6b486
 # ╟─ce603931-baa5-48aa-ba13-82b458962ddf
 # ╠═3cfce228-b634-4e31-b3f3-ddadb6c7a53d
 # ╠═6b3a83eb-e316-46b5-a097-233145ab1bcc
@@ -2045,25 +2061,22 @@ version = "1.4.1+1"
 # ╟─fad551be-abbc-45c6-b08c-5e8d4ddccdb0
 # ╠═fbd9a83b-17b4-47db-a46e-e7a9037b9090
 # ╟─26f43214-3b99-4c99-9512-398a28f9ae0a
+# ╠═24077fc9-4d06-4b80-91be-321a7bb0fe5c
 # ╠═b226106d-6f21-4d72-951c-c4d9d01cbbcb
 # ╟─aa0c8fec-254b-4805-bf07-b1ce7266685c
-# ╟─03c85588-2237-4d17-9755-bd3386f8e348
-# ╠═24077fc9-4d06-4b80-91be-321a7bb0fe5c
-# ╟─50cb4c19-1d76-4844-8bc7-bc564aa34ab8
 # ╟─8615c4ca-7e2b-49fb-bb0f-078347a7c56b
 # ╟─be7f3b8d-70e6-4ec3-a98f-07fbe17fb06a
-# ╠═820f0070-98b9-4bf6-a8db-65383e7c3c17
+# ╟─820f0070-98b9-4bf6-a8db-65383e7c3c17
 # ╟─66cae8d2-8e20-4b1e-9dae-e120eee4d944
 # ╠═5af22ae0-effd-4589-bd1f-d375299b6848
+# ╠═5ee4f31b-ebae-4d8f-8ccc-6df671de6965
+# ╠═859c21c8-74cc-4db1-9a35-4e75e4a4ab66
 # ╠═493a6c95-3820-43aa-8e6c-939757aecf2b
 # ╠═2c379af2-73d9-4470-8f7f-9dafa789e951
 # ╠═6287eddc-9b35-489e-b584-8197c09cb228
-# ╠═5ee4f31b-ebae-4d8f-8ccc-6df671de6965
 # ╠═3f6fbfd0-b35a-4af9-86cd-55d7e4188301
 # ╠═2dde11e3-dcc7-416b-b351-bcf526f3deaa
 # ╠═5fbbf58e-2c28-4b80-b524-49f881258f46
 # ╟─8bc7e78b-ff6d-4553-b327-f03d21651121
-# ╠═1cc93533-0edb-4db9-9016-4f52f3822b0a
-# ╠═b977a080-5e47-45fb-ad78-8080f93fa650
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
